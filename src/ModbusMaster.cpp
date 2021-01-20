@@ -926,7 +926,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
             _u16ResponseBuffer[i] = word(u8ModbusADU[2 * i + 4], u8ModbusADU[2 * i + 3]);
           }
           
-          _u8ResponseBufferLength = i;
+          _u8ResponseBufferLength = i + 1; // i is zero indexed
         }
         
         // in the event of an odd number of bytes, load last byte into zero-padded word
@@ -937,7 +937,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
             _u16ResponseBuffer[i] = word(0, u8ModbusADU[2 * i + 3]);
           }
           
-          _u8ResponseBufferLength = i + 1;
+          _u8ResponseBufferLength = i + 2; // i is zero indexed
         }
         break;
         
@@ -952,7 +952,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
             _u16ResponseBuffer[i] = word(u8ModbusADU[2 * i + 3], u8ModbusADU[2 * i + 4]);
           }
           
-          _u8ResponseBufferLength = i;
+          _u8ResponseBufferLength = i + 1; // i is zero indexed
         }
         break;
 
