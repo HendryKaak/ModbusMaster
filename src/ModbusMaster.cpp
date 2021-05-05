@@ -47,13 +47,7 @@ Creates class object; initialize it using ModbusMaster::begin().
 @ingroup setup
 */
 ModbusMaster::ModbusMaster(void)
-{
-  _idle = 0;
-  _preTransmission = 0;
-  _postTransmission = 0;
-  _logTransmit = 0;
-  _logReceive = 0;
-}
+{ }
 
 /**
 Initialize class object.
@@ -185,7 +179,7 @@ serial ports, etc. is permitted within callback function.
 
 @see ModbusMaster::ModbusMasterTransaction()
 */
-void ModbusMaster::idle(void (*idle)())
+void ModbusMaster::idle(callback_function_t idle)
 {
   _idle = idle;
 }
@@ -200,7 +194,7 @@ Driver Enable pin, and optionally disable its Receiver Enable pin.
 @see ModbusMaster::ModbusMasterTransaction()
 @see ModbusMaster::postTransmission()
 */
-void ModbusMaster::preTransmission(void (*preTransmission)())
+void ModbusMaster::preTransmission(callback_function_t preTransmission)
 {
   _preTransmission = preTransmission;
 }
@@ -218,7 +212,7 @@ Receiver Enable pin, and disable its Driver Enable pin.
 @see ModbusMaster::ModbusMasterTransaction()
 @see ModbusMaster::preTransmission()
 */
-void ModbusMaster::postTransmission(void (*postTransmission)())
+void ModbusMaster::postTransmission(callback_function_t postTransmission)
 {
   _postTransmission = postTransmission;
 }

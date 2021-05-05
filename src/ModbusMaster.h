@@ -48,10 +48,12 @@ Set to 1 to enable debugging features within class:
 
 /* _____STANDARD INCLUDES____________________________________________________ */
 // include types & constants of Wiring core API
+#include <functional>
 #include "Arduino.h"
 
 /* _____UTILITY MACROS_______________________________________________________ */
 
+using callback_function_t = std::function<void(void)>;
 
 /* _____PROJECT INCLUDES_____________________________________________________ */
 
@@ -67,9 +69,9 @@ class ModbusMaster
     ModbusMaster();
    
     void begin(uint8_t, Stream &serial);
-    void idle(void (*)());
-    void preTransmission(void (*)());
-    void postTransmission(void (*)());
+    void idle(callback_function_t idle = nullptr);
+    void preTransmission(callback_function_t preTransmission = nullptr);
+    void postTransmission(callback_function_t postTransmission = nullptr);
     void logTransmit(void (*)(const uint8_t *data, size_t length));
     void logReceive(void (*)(const uint8_t *data, size_t length, uint8_t status));
 
@@ -264,11 +266,11 @@ class ModbusMaster
     uint8_t ModbusMasterTransaction(uint8_t u8MBFunction);
     
     // idle callback function; gets called during idle time between TX and RX
-    void (*_idle)();
+    callback_function_t _idle;
     // preTransmission callback function; gets called before writing a Modbus message
-    void (*_preTransmission)();
+    callback_function_t _preTransmission;
     // postTransmission callback function; gets called after a Modbus message has been sent
-    void (*_postTransmission)();
+    callback_function_t _postTransmission;
     // logTransmit callback function; gets called before writing a Modbus message
     void (*_logTransmit)(const uint8_t *data, size_t length);
     // logReceive callback function; gets called after reading a Modbus message
