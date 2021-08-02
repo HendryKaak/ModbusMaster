@@ -271,6 +271,11 @@ class ModbusMaster
     void (*_logTransmit)(const uint8_t *data, size_t length);
     // logReceive callback function; gets called after reading a Modbus message
     void (*_logReceive)(const uint8_t *data, size_t length, uint8_t status);
+
+    int _serial_read(bool discard = false);
+    int _serial_write(uint8_t b);
+    void _debug(uint8_t b, char type);
+    int response_time;
 };
 #endif
 

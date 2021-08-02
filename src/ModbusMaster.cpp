@@ -656,6 +656,8 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   uint16_t u8BytesLeft = 8;
   uint8_t u8MBStatus = ku8MBSuccess;
 
+  if (false)
+    Serial.println("Transaction");
   // assemble Modbus Request Application Data Unit
   u8ModbusADU[u16ModbusADUSize++] = _u8MBSlave;
   u8ModbusADU[u16ModbusADUSize++] = u8MBFunction;
@@ -771,7 +773,7 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   }
 
   // flush receive buffer before transmitting request
-  while (_serial->read() != -1);
+  while (_serial_read(true) != -1);
 
   // transmit request
   if (_preTransmission)
@@ -780,8 +782,10 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   }
   for (i = 0; i < u16ModbusADUSize; i++)
   {
-    _serial->write(u8ModbusADU[i]);
+    _serial_write(u8ModbusADU[i]);
   }
+
+  response_time = micros();
 
   u16ModbusADUSize = 0;
   _serial->flush();    // flush transmit buffer
@@ -805,10 +809,14 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
 #if __MODBUSMASTER_DEBUG__
       digitalWrite(__MODBUSMASTER_DEBUG_PIN_A__, true);
 #endif
-      int data = _serial->read();
+      int data = _serial_read();
 
       if (data != -1)
       {
+        /*if (u16ModbusADUSize == 1) {
+          Serial.print("Response time:");
+          Serial.println(micros() - response_time);
+        }*/
         u8ModbusADU[u16ModbusADUSize++] = data;
         u8BytesLeft--;
       }
@@ -967,4 +975,29 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
   u16TransmitBufferLength = 0;
   _u8ResponseBufferIndex = 0;
   return u8MBStatus;
+}
+
+int ModbusMaster::_serial_read(bool discard)
+{
+  int read = _serial->read();
+  if (read >= 0)
+      _debug(read, discard ? 'D': 'R');
+  return read;
+}
+
+int ModbusMaster::_serial_write(uint8_t b) {
+  _debug(b, 'W');
+  return _serial->write(b);
+}
+
+void ModbusMaster::_debug(uint8_t b, char type) {
+  if (false) {
+    Serial.print(micros());
+    Serial.print(" ");
+    Serial.write(type);
+    Serial.print(": ");
+    if (b < 0x10)
+      Serial.write('0');
+    Serial.println(b, HEX);
+  }
 }
