@@ -36,7 +36,7 @@ Arduino library for communicating with Modbus slaves over RS232/485 (via RTU pro
 #include "util/word.h"
 
 /* _____GLOBAL VARIABLES_____________________________________________________ */
-
+constexpr bool SHOW_RESPONSE_TIME = false;
 
 /* _____PUBLIC FUNCTIONS_____________________________________________________ */
 /**
@@ -785,7 +785,8 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
     _serial_write(u8ModbusADU[i]);
   }
 
-  response_time = micros();
+  if (SHOW_RESPONSE_TIME)
+    response_time = micros();
 
   u16ModbusADUSize = 0;
   _serial->flush();    // flush transmit buffer
@@ -813,10 +814,10 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
 
       if (data != -1)
       {
-        /*if (u16ModbusADUSize == 1) {
+        if (SHOW_RESPONSE_TIME && u16ModbusADUSize == 1) {
           Serial.print("Response time:");
           Serial.println(micros() - response_time);
-        }*/
+        }
         u8ModbusADU[u16ModbusADUSize++] = data;
         u8BytesLeft--;
       }
@@ -891,6 +892,10 @@ uint8_t ModbusMaster::ModbusMasterTransaction(uint8_t u8MBFunction)
     }
     if ((millis() - u32StartTime) > ku16MBResponseTimeout)
     {
+      if (SHOW_RESPONSE_TIME) {
+        Serial.print("Response timeout:");
+        Serial.println(micros() - response_time);
+      }
       u8MBStatus = ku8MBResponseTimedOut;
     }
   }
